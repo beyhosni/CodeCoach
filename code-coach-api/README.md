@@ -575,17 +575,4 @@ Chaque modification doit respecter :
 
 ---
 
-## 📄 License
 
-TBD
-
----
-
-## 📞 Contact
-
-Architecture : Senior Software Architect & Lead Backend Engineer
-Tech Stack : Java 17, Spring Boot 3, PostgreSQL, Redis, Kafka
-
----
-
-**Last updated:** 30 Jan 2025 | **Version:** 0.1.0-SNAPSHOT
