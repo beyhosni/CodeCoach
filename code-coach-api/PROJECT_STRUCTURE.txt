@@ -1,0 +1,359 @@
+CODE COACH BACKEND - FINAL PROJECT STRUCTURE
+==============================================
+
+code-coach-api/
+│
+├── 📄 pom.xml                              [Maven Parent - Dependency Management]
+├── 📄 README.md                            [Documentation technique complète]
+├── 📄 QUICKSTART.md                        [Démarrage en 5 minutes]
+├── 📄 ARCHITECTURE.md                      [Architecture détaillée + décisions]
+├── 📄 STEP1_COMPLETION.md                  [Checklist de complétion STEP 1]
+├── 📄 VISUAL_SUMMARY.md                    [Résumé visual]
+├── 📄 FIXTURES.sql                         [Données d'exemple SQL]
+├── 📄 .gitignore                           [Git ignore Maven + IDE]
+│
+├── 📁 shared-module/                       [DTOs, Exceptions, Configs]
+│   ├── pom.xml
+│   └── src/main/java/com/codecoach/shared/
+│       ├── dto/
+│       │   ├── AuthRequestDto.java
+│       │   ├── AuthResponseDto.java
+│       │   ├── UserRegisterDto.java
+│       │   ├── UserDto.java
+│       │   ├── ExerciseDto.java
+│       │   ├── SubmissionDto.java
+│       │   └── SubmissionResultDto.java
+│       └── entity/  [Shared entity references]
+│
+├── 📁 auth-module/                         [JWT + Spring Security]
+│   ├── pom.xml
+│   └── src/main/java/com/codecoach/auth/
+│       ├── jwt/
+│       │   └── JwtTokenProvider.java       [Generate/Validate JWT tokens]
+│       ├── security/
+│       │   └── JwtAuthenticationFilter.java [Extract & validate JWT]
+│       ├── config/
+│       │   ├── SecurityConfig.java         [Spring Security stateless]
+│       │   └── AuthModuleConfig.java       [@ComponentScan config]
+│       └── controller/
+│           └── AuthController.java         [POST /auth/register, /auth/login]
+│
+├── 📁 user-module/                         [User CRUD + Password Hashing]
+│   ├── pom.xml
+│   └── src/main/java/com/codecoach/user/
+│       ├── entity/
+│       │   └── User.java                   [LEARNER/INSTRUCTOR/ADMIN roles]
+│       ├── repository/
+│       │   └── UserRepository.java         [JPA interface]
+│       ├── service/
+│       │   └── UserService.java            [Register + Validation]
+│       └── config/
+│           └── UserModuleConfig.java
+│
+├── 📁 content-module/                      [Curriculum - Tracks & Exercises]
+│   ├── pom.xml
+│   └── src/main/java/com/codecoach/content/
+│       ├── entity/
+│       │   ├── Track.java                  [Pistes d'apprentissage]
+│       │   └── Exercise.java               [Exercices + test_code secret]
+│       ├── repository/
+│       │   ├── TrackRepository.java
+│       │   └── ExerciseRepository.java
+│       ├── service/
+│       │   └── ExerciseService.java        [Read curriculum only]
+│       ├── controller/
+│       │   └── ExerciseController.java     [GET /exercises/track/{id}]
+│       └── config/
+│           └── ContentModuleConfig.java
+│
+├── 📁 submission-module/                   [Soumissions Code - Versioning]
+│   ├── pom.xml
+│   └── src/main/java/com/codecoach/submission/
+│       ├── entity/
+│       │   ├── Submission.java             [Immutable code submissions]
+│       │   └── SubmissionResult.java       [Errors + test results]
+│       ├── repository/
+│       │   ├── SubmissionRepository.java
+│       │   └── SubmissionResultRepository.java
+│       ├── service/
+│       │   └── SubmissionService.java      [Create + Versioning]
+│       ├── controller/
+│       │   └── SubmissionController.java   [POST/GET submissions]
+│       └── config/
+│           └── SubmissionModuleConfig.java
+│
+├── 📁 runner-module/                       [Execution Orchestration [TODO STEP 2]]
+│   ├── pom.xml
+│   └── src/main/java/com/codecoach/runner/
+│       └── config/
+│           └── RunnerModuleConfig.java     [Placeholder]
+│
+├── 📁 coach-module/                        [IA Socratique [TODO STEP 3]]
+│   ├── pom.xml
+│   └── src/main/java/com/codecoach/coach/
+│       ├── entity/
+│       │   ├── CoachConversation.java      [Thread de coaching]
+│       │   └── CoachMessage.java           [QUESTION/HINT/PSEUDO_CODE/...]
+│       └── config/
+│           └── CoachModuleConfig.java      [Placeholder]
+│
+├── 📁 progress-module/                     [Progression & Gamification [TODO STEP 2]]
+│   ├── pom.xml
+│   └── src/main/java/com/codecoach/progress/
+│       ├── entity/
+│       │   └── SkillProgress.java          [Mastery tracking]
+│       └── config/
+│           └── ProgressModuleConfig.java   [Placeholder]
+│
+└── 📁 api-module/                          [Spring Boot Application Principale]
+    ├── pom.xml
+    ├── src/
+    │   ├── main/
+    │   │   ├── java/com/codecoach/
+    │   │   │   └── CodeCoachApplication.java   [Spring Boot Main]
+    │   │   └── resources/
+    │   │       ├── application.yml             [Configuration PostgreSQL, JWT, Redis]
+    │   │       └── db/migration/
+    │   │           ├── V1__init_user_table.sql
+    │   │           ├── V2__init_track_table.sql
+    │   │           ├── V3__init_exercise_table.sql
+    │   │           ├── V4__init_submission_table.sql
+    │   │           ├── V5__init_submission_result_table.sql
+    │   │           ├── V6__init_coach_conversation_table.sql
+    │   │           ├── V7__init_coach_message_table.sql
+    │   │           └── V8__init_skill_progress_table.sql
+    │   └── test/
+    │       └── [Tests placeholder for STEP 2]
+
+
+ARCHITECTURE OVERVIEW
+====================
+
+API Entry Point: http://localhost:8080/api/v1
+
+├── POST   /auth/register          → Create account + JWT token
+├── POST   /auth/login             → Login + JWT token
+│
+├── GET    /exercises/track/{id}   → List exercises (no test_code)
+├── GET    /exercises/{id}/details → Exercise details (no test_code)
+│
+├── POST   /submissions/{exId}     → Submit code (status=PENDING)
+├── GET    /submissions            → User submission history
+└── GET    /submissions/{id}       → Submission details (with result async)
+
+[STEP 2] Async execution via Docker + Kafka
+[STEP 3] Coach IA analyzes errors + generates hints
+[STEP 4] WebSocket live feedback to frontend
+
+
+DATABASE SCHEMA
+==============
+
+cc_user
+  ├─ id (PK)
+  ├─ email (UNIQUE)
+  ├─ username (UNIQUE)
+  ├─ password_hash (BCrypt)
+  ├─ role (LEARNER | INSTRUCTOR | ADMIN)
+  └─ timestamps
+
+cc_track
+  ├─ id (PK)
+  ├─ title
+  ├─ created_by_user_id (FK)
+  └─ difficulty (1-5)
+
+cc_exercise
+  ├─ id (PK)
+  ├─ track_id (FK)
+  ├─ title
+  ├─ test_code (NEVER exposed to learner!)
+  └─ timeout_millis, memory_limit_mb
+
+cc_submission
+  ├─ id (PK)
+  ├─ exercise_id (FK)
+  ├─ user_id (FK)
+  ├─ code
+  ├─ status (PENDING | SUCCESS | FAILED | ERROR)
+  └─ attempt_number
+
+cc_submission_result
+  ├─ id (PK)
+  ├─ submission_id (FK, UNIQUE)
+  ├─ compilation_error
+  ├─ runtime_error
+  ├─ tests_passed
+  ├─ tests_failed
+  └─ execution_time_ms
+
+cc_coach_conversation
+  ├─ id (PK)
+  ├─ submission_id (FK, UNIQUE)
+  ├─ hint_level (1-4)
+  └─ context (JSON)
+
+cc_coach_message
+  ├─ id (PK)
+  ├─ conversation_id (FK)
+  ├─ type (QUESTION | HINT | PSEUDO_CODE | EXPLANATION)
+  └─ content
+
+cc_skill_progress
+  ├─ id (PK)
+  ├─ user_id (FK)
+  ├─ exercise_id (FK)
+  ├─ successful_attempts
+  ├─ total_attempts
+  └─ is_mastered (boolean)
+
+
+TECHNOLOGY STACK
+===============
+
+Java 17 LTS
+Spring Boot 3.2.1
+Spring Security 6.x + JWT HMAC-SHA256
+Spring Data JPA + Hibernates
+PostgreSQL 15+
+Flyway DB migration
+Redis 6+ (optional MVP, essential STEP 2+)
+Kafka (placeholder, essential STEP 2+)
+Maven 3.8+ (multi-module)
+Lombok (annotations)
+MapStruct (DTO mapping)
+Jakarta Validation
+
+
+SECURITY MODEL
+==============
+
+Authentification
+├─ POST /auth/register + /auth/login
+├─ JWT token generation (HMAC-SHA256)
+└─ Token expiration: 24h
+
+Authorization
+├─ Spring Security @PreAuthorize("hasRole('LEARNER')")
+├─ JWT filter extracts + validates token
+└─ Stateless API (no sessions)
+
+Password Security
+├─ BCrypt hashing (12 rounds)
+├─ Never store plaintext password
+└─ Always validate via UserService
+
+Execution Isolation [STEP 2]
+├─ Docker container per submission
+├─ Network disabled
+├─ CPU/memory limits
+└─ Timeout strict
+
+
+PROJECT STATISTICS
+=================
+
+Files created:        50+
+Java classes:         35+
+Services:             4
+Controllers:          3
+Entities:             8
+DTOs:                 7
+Repositories:         4
+DB Migrations:        8
+Configuration files:  7
+Documentation pages:  5
+Code lines:           2000+ (excluding tests)
+Test coverage:        0% (planned STEP 2+)
+
+
+ROADMAP
+======
+
+✅ STEP 1 (COMPLETED 30-JAN-2025)
+   ├─ Modular Monolith architecture (9 modules)
+   ├─ JWT authentication + Spring Security
+   ├─ User CRUD + registration
+   ├─ Exercise CRUD (read-only for learners)
+   ├─ Submission system (stub without execution)
+   ├─ Database schema + Flyway migrations
+   ├─ REST API endpoints
+   └─ Documentation (README, QUICKSTART, ARCHITECTURE)
+
+⏳ STEP 2 (NEXT)
+   ├─ Docker image for secure Java execution
+   ├─ Kafka queue for async submissions
+   ├─ Timeout + resource limits enforcement
+   ├─ SubmissionResult persistence
+   └─ Progress tracking implementation
+
+⏳ STEP 3
+   ├─ Error analysis + classification (NLP)
+   ├─ Intelligent hint generation
+   ├─ Socratic conversation stateful storage (Redis)
+   └─ Coach IA integration
+
+⏳ STEP 4
+   ├─ Frontend React application
+   ├─ Code editor (Monaco)
+   ├─ WebSocket live feedback
+   ├─ Gamification (badges, streaks)
+   └─ Responsive dashboard
+
+
+QUICK START
+===========
+
+1. Create Database
+   $ createdb -U postgres -W codecoach
+
+2. Build
+   $ cd code-coach-api
+   $ mvn clean package -DskipTests
+
+3. Run
+   $ java -jar api-module/target/api-module-0.1.0-SNAPSHOT.jar
+
+4. Test
+   $ curl http://localhost:8080/api/v1/actuator/health
+
+5. Register & Login
+   $ curl -X POST http://localhost:8080/api/v1/auth/register \
+     -H "Content-Type: application/json" \
+     -d '{"email":"alice@example.com","username":"alice","password":"Pass123!"}'
+
+API available at: http://localhost:8080/api/v1
+
+
+KEY DECISIONS
+=============
+
+✅ Modular Monolith (vs Microservices from day 1)
+   Reason: MVP agility + easy extraction later
+
+✅ JWT stateless (no refresh tokens yet)
+   Reason: Simple, scalable, perfect for MVP
+
+✅ DTOs mandatory (no entities in JSON)
+   Reason: API abstraction + security
+
+✅ Test_code in database (never exposed)
+   Reason: Immutable, secure, audit trail
+
+✅ Flyway migrations (SQL versioning)
+   Reason: Track schema history, reproducible
+
+✅ Socratic coaching (not autocomplete)
+   Reason: Force understanding, not just code production
+
+✅ Docker isolation [STEP 2]
+   Reason: Safe code execution from untrusted sources
+
+---
+
+VERSION:  0.1.0-SNAPSHOT
+DATE:     30 January 2025
+STATUS:   ✅ STEP 1 COMPLETE - Ready for STEP 2
+BUILT BY: Senior Software Architect & Lead Backend Engineer
+
+---
