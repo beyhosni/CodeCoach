@@ -15,6 +15,20 @@
     <name>Runner Module</name>
     <description>Orchestration exécution sécurisée de code - Interface abstraite vers Docker/Containers</description>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>none</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>com.codecoach</groupId>
