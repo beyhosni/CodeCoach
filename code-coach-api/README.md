@@ -1,6 +1,40 @@
-# Code Coach - Backend API
+# 🎓 Code Coach - Backend API
 
-🎓 **Plateforme d'apprentissage du code par compréhension (Socratic Coaching)**
+> **Plateforme d'apprentissage du code par compréhension basée sur la méthode socratique**
+
+---
+
+## 🎯 Qu'est-ce que Code Coach ?
+
+**Code Coach** est une plateforme révolutionnaire qui enseigne la programmation par la **compréhension**, pas par l'autocomplete.
+
+### 📚 Le problème
+Les plateformes traditionnelles (LeetCode, HackerRank, etc.) :
+- ❌ Fournissent des solutions complètes
+- ❌ Encouragent le copy-paste
+- ❌ N'enseignent pas la **réflexion**
+- ❌ Créent une illusion de compréhension
+
+### ✨ Notre solution
+Code Coach applique la **méthode socratique** :
+- ✅ **Jamais** de solution complète
+- ✅ **Toujours** une question avant une réponse
+- ✅ Hints graduels : Question → Concept → Pseudo-code → Explication
+- ✅ Progression tracée (savoir qui a vraiment compris)
+
+### 🎓 Exemple d'interaction
+
+**Apprenant :** "Je dois écrire une fonction pour vérifier si un nombre est pair"
+
+**Coach IA :**
+1. **Niveau 1 (QUESTION)** : "Comment appelle-t-on l'opération qui retourne le reste d'une division ?"
+2. **Niveau 2 (HINT)** : "Pense au modulo (%) en Java..."
+3. **Niveau 3 (PSEUDO_CODE)** : "if (nombre % 2 == ...) { return ...; }"
+4. **Niveau 4 (EXPLANATION)** : "Quand le reste est 0, c'est pair !"
+
+*Le coach ne donne JAMAIS la solution complète.*
+
+---
 
 ## 📊 Statut du Projet
 
@@ -201,19 +235,103 @@ Response: (même format que ci-dessus)
 
 ---
 
-## 📦 Stack technique
+## � Stack Technique
 
-| Composant | Technologie | Version |
-|-----------|------------|---------|
-| **Framework** | Spring Boot | 3.2.1 |
-| **Language** | Java | 17 |
-| **Database** | PostgreSQL | 15+ |
-| **Migration** | Flyway | 9.x |
-| **Security** | Spring Security + JWT | - |
-| **Cache** | Redis | 6+ |
-| **Build** | Maven | 3.8+ |
-| **Async** | Kafka (stub) | - |
-| **Monitoring** | Micrometer | - |
+### 🏗️ Backend & Framework
+
+```
+┌──────────────────────────────────────────────────┐
+│   🚀 Spring Boot 3.2.1                          │
+│   ☕ Java 17 LTS (Modern, Stable, GraalVM)    │
+│   📦 Maven 3.8+ Multi-modules                  │
+│   🔒 Spring Security 6.x                       │
+└──────────────────────────────────────────────────┘
+```
+
+### 🗄️ Données & Persistance
+
+| Composant | Tech | Version | Rôle |
+|-----------|------|---------|------|
+| **Database** | 🐘 PostgreSQL | 15+ | ACID, JSON, Audit trail |
+| **Migrations** | 🌊 Flyway | 9.x | Versioning DB schema (immutable) |
+| **ORM** | 🔗 JPA/Hibernate | 6.x | Object-Relational Mapping |
+
+### 🔐 Sécurité & Authentification
+
+| Composant | Tech | Détails |
+|-----------|------|---------|
+| **Authentification** | 🔑 JWT | HMAC-SHA256, Token 24h |
+| **Hachage Passwords** | 🛡️ BCrypt | 12 rounds (GPU-resistant) |
+| **Autorisation** | 👤 Spring Security | @PreAuthorize par rôle |
+| **Validation** | ✅ Jakarta Validation | @Valid sur input |
+
+### 🚄 Cache & Async Processing
+
+```
+┌────────────────────────────────────────┐
+│ 💾 Redis 6+ (Caching + Rate Limit)     │
+│ 📨 Kafka (Async Event Streaming)       │
+│ ⚡ @EnableAsync (Background tasks)    │
+└────────────────────────────────────────┘
+```
+
+### 🛠️ Utilitaires & Librairies
+
+| Catégorie | Technologie | Rôle |
+|-----------|-------------|------|
+| **DTO Mapping** | 🗺️ MapStruct | Auto-mapping entités → DTOs |
+| **Annotations** | 🧊 Lombok | Reduce boilerplate (@Slf4j, @Data) |
+| **Validation** | ✅ Jakarta | @Valid, custom validators |
+| **Logging** | 📝 SLF4J + Logback | Structured logging |
+| **Testing** | 🧪 JUnit 5 | Unit & integration tests |
+| **Monitoring** | 📊 Micrometer | Prometheus metrics (ready) |
+
+### 📊 Architecture Générale
+
+```
+┌──────────────────────────────────────────────────────┐
+│         Frontend (React - STEP 4)                    │
+│    Monaco Editor, WebSocket, Live Feedback           │
+└────────┬─────────────────────────────────┬──────────┘
+         │ HTTP/REST                       │ WebSocket
+         │                                 │
+┌────────▼─────────────────────────────────▼──────────┐
+│      🚀 API Module (Spring Boot 3)                   │
+│      8 REST Endpoints, JWT Auth                      │
+└────────┬──────────────────────────────────┬──────────┘
+         │                                  │
+   ┌─────▼──┬──────────┬────────┬──────┬───┴────┬────────┐
+   │         │          │        │      │        │        │
+  Auth    User     Content   Submit  Runner   Coach   Progress
+  Mod     Mod      Mod       Mod     Mod      Mod     Mod
+   │         │          │        │      │        │        │
+   └─────────┴──────────┴────────┴──────┴────────┴────────┘
+        (Tous → shared-module: DTOs uniquement)
+              ↓
+    ┌─────────────────────────────┐
+    │ 🗄️  PostgreSQL 15+          │
+    │ (8 Tables + Audit Trail)     │
+    │ 🌊 Flyway Migrations (V1-V8) │
+    └─────────────────────────────┘
+              ↓
+    ┌─────────────────────────────┐
+    │ 💾 Redis 6+ (Cache)         │
+    │ 📨 Kafka (Event Streaming)   │
+    └─────────────────────────────┘
+```
+
+### ✨ Highlights Technologiques
+
+| Feature | Implémentation | Avantage |
+|---------|----------------|----------|
+| 🔐 **JWT Stateless** | HMAC-SHA256, 24h expiration | Scale horizontalement |
+| 🛡️ **BCrypt Hashing** | 12-rounds (0.5-1s per hash) | Résiste GPU/Rainbow tables |
+| 📦 **Modular Monolith** | 9 modules indépendants | Facile extraction microservices |
+| 🗄️ **Flyway Versioning** | V1-V8 immutable | Reproducible DB schema |
+| 🔍 **Audit Trail** | created_at, updated_at | Traçabilité complète |
+| ⚡ **Async Ready** | @EnableAsync + Kafka | Non-blocking operations |
+| 🚀 **Spring Boot 3** | Latest stable + GraalVM | Future-proof |
+| 🎯 **Test Code Isolation** | Jamais exposé en API | Sécurité pédagogique |
 
 ---
 
