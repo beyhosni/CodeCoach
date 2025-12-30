@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  @apply box-border;
+}
+
+html,
+body {
+  @apply h-full m-0 p-0;
+}
+
+#root {
+  @apply h-full;
+}
+
+body {
+  @apply bg-white dark:bg-coach-dark text-gray-900 dark:text-gray-100;
+}
+
+/* Monaco Editor tweaks */
+.monaco-editor .margin {
+  @apply bg-gray-50 dark:bg-gray-800;
+}
+
+.monaco-editor {
+  @apply rounded-md border border-gray-200 dark:border-gray-700;
+}
